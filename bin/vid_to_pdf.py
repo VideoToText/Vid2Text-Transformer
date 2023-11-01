@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from PIL import ImageTk, Image
 from tkinter import filedialog as fd
 from tkinter import ttk
+from src.main import main as video_to_pdf_main
 # from threading import Thread
 # from downloader import download
 
@@ -112,7 +113,7 @@ class VidToPdf:
             return
         else:
             self.set()
-            # 추가 로직 구현 예정
+            video_to_pdf_main()
 
     def set(self):
         url = self.urlentry.get()

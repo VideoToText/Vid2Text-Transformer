@@ -13,7 +13,7 @@ def extract_text_from_video(video_path):
     video_context = videointelligence.VideoContext()
 
     count = 0
-    with io.open(path, "rb") as file:
+    with io.open(video_path, "rb") as file:
         input_content = file.read()
 
     logging.basicConfig(level=logging.INFO)
