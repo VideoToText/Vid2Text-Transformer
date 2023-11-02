@@ -9,7 +9,7 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 from threading import Thread
 from src.vid_downloader import vid_download
-from src.audio_to_text import transcribe_audio_from_video
+from src.audio_to_text import convert_audio_from_video
 from src.text_extractor import extract_text_from_video
 from src.gpt_processor import process_video_contents_with_gpt, setup_gpt
 from src.pdf_generator import generate_pdf_from_text
@@ -121,14 +121,16 @@ class VidToPdf:
             self.set()
             setup_gpt()
 
+            # Download YouTube audio & video
+            path = vid_download(self, url, os.path.join(resource_dir, 'resources'))
             '''
             Add features here
             '''
-            
-            # Download video file to resource file
-            thread = Thread(target=vid_download, args=[self, url, os.path.join(resource_dir, 'resources')])
-            thread.setDaemon(False)
-            thread.start()
+            audio_text = convert_audio_from_video(audio_path=path[0])
+            video_text = ''
+
+            structured_output = process_video_contents_with_gpt(audio_text, video_text)
+            generate_pdf_from_text(structured_output, "output.pdf")
 
     def set(self, *args):
         url = self.urlentry.get()

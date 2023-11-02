@@ -12,6 +12,7 @@ def vid_download(gui, url, folder):
     os.remove(audio_file_path)
     gui.progress['value'] = 15
     gui.statusmsg.set(f'Downloading YouTube video')
-    yt.streams.get_highest_resolution().download(folder)
+    video_file_path = yt.streams.get_highest_resolution().download(folder)
     gui.statusmsg.set(f'YouTube audio & video download completed')
     gui.progress['value'] = 30
+    return [audio_file_path, video_file_path]

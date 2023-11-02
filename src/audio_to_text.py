@@ -1,7 +1,7 @@
 import speech_recognition as sr
 
 
-def transcribe_audio_from_video(audio_path):
+def convert_audio_from_video(audio_path):
     sr_instance = sr.Recognizer()
 
     with sr.AudioFile(audio_path) as source:
