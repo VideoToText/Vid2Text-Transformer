@@ -7,9 +7,9 @@ from bs4 import BeautifulSoup
 from PIL import ImageTk, Image
 from tkinter import filedialog as fd
 from tkinter import ttk
+from threading import Thread
+from src.vid_downloader import vid_download
 from src.main import main as video_to_pdf_main
-# from threading import Thread
-# from downloader import download
 
 __author__ = "sonjh.dev@gmail.com"
 VER = 'v0.1'
@@ -34,9 +34,8 @@ class VidToPdf:
         self.vtitlemsg.set('vid2pdf')
 
         self.logo_panel = None
-        self.create_widgets()
 
-    def create_widgets(self):
+        # 병합된 create_widgets 함수의 내용
         content = ttk.Frame(self.root, padding=10)
         content.grid(row=0, column=0, sticky=(tk.N, tk.W, tk.E, tk.S))
 
@@ -87,14 +86,16 @@ class VidToPdf:
         self.status.grid(row=1, column=1, sticky=tk.W)
 
         progress_label = ttk.Label(progress_panel, text='Progress:   ', anchor=tk.W)
-        progress = ttk.Progressbar(progress_panel, orient=tk.HORIZONTAL, length=330, mode='determinate')
+        self.progress = ttk.Progressbar(progress_panel, orient=tk.HORIZONTAL, length=330, mode='determinate')
         start_button = ttk.Button(progress_panel, text="Start", command=self.start)
 
         progress_label.grid(row=0, column=0, sticky=tk.W)
-        progress.grid(row=0, column=1, sticky=tk.W)
+        self.progress.grid(row=0, column=1, sticky=tk.W)
         start_button.grid(row=0, column=2, padx=45, sticky=tk.W)
 
-    def folder(self):
+        self.root.mainloop()
+
+    def folder(self, *args):
         self.saveto = fd.askdirectory()
         if self.saveto == '':
             return
@@ -102,24 +103,32 @@ class VidToPdf:
         self.savetoentry.delete(0, tk.END)
         self.savetoentry.insert(0, self.saveto)
 
-    def start(self):
+    def start(self, *args):
         url = self.urlentry.get()
         folder = self.savetoentry.get()
         if url == '':
-            self.statusmsg.set('Enter Youtube URL for converting Video!!')
+            self.statusmsg.set('Enter Youtube URL for converting Video')
+            self.status.config(foreground='red')
             return
         elif folder == '':
-            self.statusmsg.set('Enter file location to save your PDF!!')
+            self.statusmsg.set('Enter file location to save your PDF')
+            self.status.config(foreground='red')
             return
         else:
             self.set()
-            video_to_pdf_main()
+            
+            # Download video file to resource file
+            thread = Thread(target=vid_download, args=[self, url, os.path.join(resource_dir, 'resources')])
+            thread.setDaemon(False)
+            thread.start()
 
-    def set(self):
+    def set(self, *args):
         url = self.urlentry.get()
-        vid_to_pdf_logo = ImageTk.PhotoImage(Image.open('resources/vid2pdf_logo_img.jpg'))
+        vid_to_pdf_logo = ImageTk.PhotoImage(Image.open(
+            os.path.join(resource_dir, 'resources/vid2pdf_logo_img.jpg')))
         if url == '':
-            self.statusmsg.set('Enter Youtube URL for converting Video!!')
+            self.statusmsg.set('Enter Youtube URL for converting Video')
+            self.status.config(foreground='red')
             return
         try:
             response = requests.get(url)
@@ -145,19 +154,21 @@ class VidToPdf:
                 raise
             self.vtitlemsg.set(title)
             self.statusmsg.set("Waiting...")
+            self.status.config(foreground='black')
 
         except Exception:
             self.vtitlemsg.set("vid2pdf")
-            self.statusmsg.set(f"Video Not Found!!")
+            self.statusmsg.set(f"Video Not Found")
+            self.status.config(foreground='red')
             logo_label = self.logo_panel.winfo_children()[0]
             logo_label.configure(image=vid_to_pdf_logo)
             logo_label.image = vid_to_pdf_logo
             logo_label.grid(row=0, column=1, pady=10)
 
-    def cancel(self):
+    def cancel(self, *args):
         self.flag = False
 
-    def run(self):
+    def run(self, *args):
         self.root.mainloop()
 
 
