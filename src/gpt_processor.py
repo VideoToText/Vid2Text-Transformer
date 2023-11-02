@@ -27,6 +27,6 @@ def process_video_contents_with_gpt(voice_data, ocr_data):
     refined_text = response['choices'][0]['message']['content'].strip()
     return refined_text
 
-setup_gpt()
-structured_output = process_video_contents_with_gpt("안녕하세요", "test.txt")
-print(structured_output)
+# setup_gpt()
+# structured_output = process_video_contents_with_gpt("안녕하세요", "test.txt")
+# print(structured_output)
