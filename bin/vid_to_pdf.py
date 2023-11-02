@@ -9,6 +9,7 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 from threading import Thread
 from src.vid_downloader import vid_download
+from src.main import main as video_to_pdf_main
 
 __author__ = "sonjh.dev@gmail.com"
 VER = 'v0.1'
@@ -115,7 +116,7 @@ class VidToPdf:
             return
         else:
             self.set()
-
+            
             # Download video file to resource file
             thread = Thread(target=vid_download, args=[self, url, os.path.join(resource_dir, 'resources')])
             thread.setDaemon(False)
