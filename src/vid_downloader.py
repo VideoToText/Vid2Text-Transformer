@@ -1,24 +1,17 @@
-import time
+import os
 from pytube import YouTube
+import moviepy.editor as mp
 
 
 def vid_download(gui, url, folder):
-    gui.statusmsg.set('Preparing to download YouTube video')
     yt = YouTube(url, use_oauth=True, allow_oauth_cache=False)
-    num_streams = len(yt.streams)
-
-    for idx, stream in enumerate(yt.streams, 1):
-        for _ in range(3):
-            vd_progress = idx / num_streams
-            gui.statusmsg.set(f'Downloading YouTube video: {round(vd_progress * 100)}% completed.')
-            time.sleep(0.5)
-            gui.progress['value'] = vd_progress * 30
-            gui.root.update_idletasks()
-        print(stream)
-
+    gui.statusmsg.set(f'Downloading YouTube audio')
+    audio_file_path = yt.streams.filter(only_audio=True).first().download(folder)
+    audio_name = os.path.splitext(audio_file_path)[0] + '.mp3'
+    mp.AudioFileClip(audio_file_path).write_audiofile(audio_name)
+    os.remove(audio_file_path)
+    gui.progress['value'] = 15
+    gui.statusmsg.set(f'Downloading YouTube video')
     yt.streams.get_highest_resolution().download(folder)
-
-    video_filter = yt.streams.filter(mime_type="video/mp4", res="720p", progressive=True)
-
-    for stream in video_filter:
-        print(stream)
+    gui.statusmsg.set(f'YouTube audio & video download completed')
+    gui.progress['value'] = 30

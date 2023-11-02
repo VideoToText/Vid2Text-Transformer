@@ -9,9 +9,12 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 from threading import Thread
 from src.vid_downloader import vid_download
-from src.main import main as video_to_pdf_main
+from src.audio_to_text import transcribe_audio_from_video
+from src.text_extractor import extract_text_from_video
+from src.gpt_processor import process_video_contents_with_gpt, setup_gpt
+from src.pdf_generator import generate_pdf_from_text
 
-__author__ = "sonjh.dev@gmail.com"
+
 VER = 'v0.1'
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -116,6 +119,11 @@ class VidToPdf:
             return
         else:
             self.set()
+            setup_gpt()
+
+            '''
+            Add features here
+            '''
             
             # Download video file to resource file
             thread = Thread(target=vid_download, args=[self, url, os.path.join(resource_dir, 'resources')])
