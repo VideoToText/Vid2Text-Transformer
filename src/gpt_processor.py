@@ -9,12 +9,12 @@ def setup_gpt():
     print(f"Loaded API Key: {api_key}")
     openai.api_key = api_key
 
-def process_video_contents_with_gpt(voice_data, ocr_data):
+def process_video_contents_with_gpt(script_data, ocr_data):
     """
     Given paths to txt files containing voice and OCR data from a video,
     use the GPT API to structure and refine it.
     """
-    prompt_content = f"Voice Data: {voice_data}\nOCR Data: {ocr_data}\n주요 키워드와 문단을 나눠서 구조화해줘."
+    prompt_content = f"Voice Data: {script_data}\nOCR Data: {ocr_data}\n주요 키워드와 문단을 나눠서 구조화해줘."
 
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
