@@ -68,8 +68,7 @@ def script_download(gui, url, folder):
         'outtmpl': f"{folder}/script.%(ext)s",
         'writesubtitles': True,
         'writeautomaticsub': True,
-        'subtitleslangs': ['en'],
-        'subtitlesformat': 'vtt'
+        'subtitleslangs': ['en']
     }
     gui.progress['value'] = 30
     gui.root.after(0, gui.update_status, 'Downloading Script...', 'black')
