@@ -35,7 +35,7 @@ def is_valid_video(url):
 def thumbnail_download(url, folder):
     ydl_opts = {
         'skip_download': True,
-        'outtmpl': f"{folder}/thumbnail.webp",
+        'outtmpl': f"{folder}/thumbnail.%(ext)s",
         'writethumbnail': True,
     }
 
@@ -48,7 +48,7 @@ def thumbnail_download(url, folder):
 def vid_download(gui, url, folder):
     ydl_opts = {
         'format': 'best[ext=mp4]',
-        'outtmpl': f"{folder}/video.mp4",
+        'outtmpl': f"{folder}/video.%(ext)s",
         'merge_output_format': 'mp4'
     }
     gui.progress['value'] = 10
