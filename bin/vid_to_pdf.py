@@ -118,6 +118,7 @@ class VidToPdf:
             return
         else:
             setup_gpt()
+            self.set()
 
             self.set_button.config(state="disabled")
             self.folder_button.config(state="disabled")
