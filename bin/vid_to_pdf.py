@@ -140,6 +140,15 @@ class VidToPdf:
             generate_pdf_from_text(self, structured_output, os.path.join(current_dir, "output.pdf"))
             delete_legacy_files()
 
+            self.video_title = "vid2pdf"
+            self.vtitlemsg.set(self.video_title)
+            self.root.after(0, self.update_status, 'Youtube URL is not valid', 'red')
+            logo_label = self.logo_panel.winfo_children()[0]
+            logo_label.configure(image=self.vid_to_pdf_logo)
+            logo_label.image = self.vid_to_pdf_logo
+            logo_label.grid(row=0, column=1, pady=10)
+
+
     def set(self, *args):
         url = self.urlentry.get()
         folder = self.savetoentry.get()
@@ -150,7 +159,6 @@ class VidToPdf:
         if not is_valid_video(url):
             self.video_title = "vid2pdf"
             self.vtitlemsg.set(self.video_title)
-            self.root.after(0, self.update_status, 'Video Not Found', 'red')
             self.root.after(0, self.update_status, 'Youtube URL is not valid', 'red')
             logo_label = self.logo_panel.winfo_children()[0]
             logo_label.configure(image=self.vid_to_pdf_logo)
