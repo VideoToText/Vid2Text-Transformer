@@ -8,4 +8,3 @@ def delete_legacy_files():
     os.remove(os.path.join(resource_dir, "script.vtt"))
     os.remove(os.path.join(resource_dir, "video.mp4"))
 
-delete_legacy_files()
