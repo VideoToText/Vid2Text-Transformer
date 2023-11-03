@@ -9,9 +9,11 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 from threading import Thread
 from src.vid_downloader import vid_download
-from src.main import main as video_to_pdf_main
+from src.get_video_script import youtube_script
+from src.text_extractor import extract_text_from_video
+from src.gpt_processor import process_video_contents_with_gpt, setup_gpt
+from src.pdf_generator import generate_pdf_from_text
 
-__author__ = "sonjh.dev@gmail.com"
 VER = 'v0.1'
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -65,15 +67,15 @@ class VidToPdf:
         saveto_label = ttk.Label(url_panel, text='Save PDF to:  ', anchor=tk.W)
         self.urlentry = ttk.Entry(url_panel, width=55)
         self.savetoentry = ttk.Entry(url_panel, width=55)
-        set_button = ttk.Button(url_panel, text="Set", command=self.set)
-        folder_button = ttk.Button(url_panel, text="Folder", command=self.folder)
+        self.set_button = ttk.Button(url_panel, text="Set", command=self.set)
+        self.folder_button = ttk.Button(url_panel, text="Folder", command=self.folder)
 
         url_label.grid(row=0, column=0, sticky=tk.W)
         self.urlentry.grid(row=0, column=1, columnspan=2, pady=10, sticky=tk.W)
-        set_button.grid(row=0, column=3, sticky=tk.W, padx=(5, 0))
+        self.set_button.grid(row=0, column=3, sticky=tk.W, padx=(5, 0))
         saveto_label.grid(row=1, column=0, sticky=tk.W)
         self.savetoentry.grid(row=1, column=1, sticky=tk.W)
-        folder_button.grid(row=1, column=3, sticky=tk.W, padx=(5, 0))
+        self.folder_button.grid(row=1, column=3, sticky=tk.W, padx=(5, 0))
 
         vtitle_label = ttk.Label(status_panel, text='Video Title:   ', anchor=tk.W)
         status_label = ttk.Label(status_panel, text='Status :   ', anchor=tk.W)
@@ -87,11 +89,11 @@ class VidToPdf:
 
         progress_label = ttk.Label(progress_panel, text='Progress:   ', anchor=tk.W)
         self.progress = ttk.Progressbar(progress_panel, orient=tk.HORIZONTAL, length=330, mode='determinate')
-        start_button = ttk.Button(progress_panel, text="Start", command=self.start)
+        self.start_button = ttk.Button(progress_panel, text="Start", command=self.start)
 
         progress_label.grid(row=0, column=0, sticky=tk.W)
         self.progress.grid(row=0, column=1, sticky=tk.W)
-        start_button.grid(row=0, column=2, padx=45, sticky=tk.W)
+        self.start_button.grid(row=0, column=2, padx=45, sticky=tk.W)
 
         self.root.mainloop()
 
@@ -104,31 +106,41 @@ class VidToPdf:
         self.savetoentry.insert(0, self.saveto)
 
     def start(self, *args):
+        Thread(target=self.process_video).start()
+
+    def process_video(self):
         url = self.urlentry.get()
         folder = self.savetoentry.get()
         if url == '':
-            self.statusmsg.set('Enter Youtube URL for converting Video')
-            self.status.config(foreground='red')
+            self.root.after(0, self.update_status, 'Enter Youtube URL for converting Video', 'red')
             return
         elif folder == '':
-            self.statusmsg.set('Enter file location to save your PDF')
-            self.status.config(foreground='red')
+            self.root.after(0, self.update_status, 'Enter file location to save your PDF', 'red')
             return
         else:
-            self.set()
-            
-            # Download video file to resource file
-            thread = Thread(target=vid_download, args=[self, url, os.path.join(resource_dir, 'resources')])
-            thread.setDaemon(False)
-            thread.start()
+            vid_title = self.set()
+            file_name = vid_title + ".mp4"
+            setup_gpt()
+
+            self.set_button.config(state="disabled")
+            self.folder_button.config(state="disabled")
+            self.start_button.config(state="disabled")
+
+            # Download YouTube audio & video
+            video_path = os.path.join(os.path.join(resource_dir, 'resources'), file_name)
+            vid_download(self, url, os.path.join(resource_dir, 'resources'))
+            script_text = youtube_script(self, url)
+            video_text = extract_text_from_video(video_path)
+
+            structured_output = process_video_contents_with_gpt(script_text, video_text)
+            generate_pdf_from_text(structured_output, "output.pdf")
 
     def set(self, *args):
         url = self.urlentry.get()
         vid_to_pdf_logo = ImageTk.PhotoImage(Image.open(
             os.path.join(resource_dir, 'resources/vid2pdf_logo_img.jpg')))
         if url == '':
-            self.statusmsg.set('Enter Youtube URL for converting Video')
-            self.status.config(foreground='red')
+            self.root.after(0, self.update_status, 'Enter Youtube URL for converting Video', 'red')
             return
         try:
             response = requests.get(url)
@@ -152,26 +164,24 @@ class VidToPdf:
             title = str(soup.find('title').string).split("- YouTube")[0].strip()
             if title == '':
                 raise
+            self.root.after(0, self.update_status, "Waiting...", 'black')
             self.vtitlemsg.set(title)
-            self.statusmsg.set("Waiting...")
-            self.status.config(foreground='black')
+
+            return title
 
         except Exception:
+            self.root.after(0, self.update_status, 'Video Not Found', 'red')
             self.vtitlemsg.set("vid2pdf")
-            self.statusmsg.set(f"Video Not Found")
-            self.status.config(foreground='red')
             logo_label = self.logo_panel.winfo_children()[0]
             logo_label.configure(image=vid_to_pdf_logo)
             logo_label.image = vid_to_pdf_logo
             logo_label.grid(row=0, column=1, pady=10)
 
-    def cancel(self, *args):
-        self.flag = False
-
-    def run(self, *args):
-        self.root.mainloop()
+    def update_status(self, msg, color):
+        self.statusmsg.set(msg)
+        self.status.config(foreground=color)
 
 
 if __name__ == '__main__':
     obj = VidToPdf()
-    obj.run()
+    obj.root.mainloop()
