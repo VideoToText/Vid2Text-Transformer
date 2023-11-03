@@ -137,7 +137,7 @@ class VidToPdf:
             video_text = extract_text_from_video(self, video_path)
 
             structured_output = process_video_contents_with_gpt(self, script_text, video_text)
-            generate_pdf_from_text(self, structured_output, os.path.join(current_dir, "output.pdf"))
+            generate_pdf_from_text(self, structured_output, os.path.join(folder, "output.pdf"))
             delete_legacy_files()
 
             self.video_title = "vid2pdf"
