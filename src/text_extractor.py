@@ -21,7 +21,7 @@ def extract_text_from_video(gui, video_path):
     logging.basicConfig(level=logging.INFO)
 
     try:
-        gui.progress['value'] = 50
+        gui.progress['value'] = 55
         gui.root.after(0, gui.update_status, 'Extracting OCR Data...', 'black')
         logging.info("API call started")
         operation = video_client.annotate_video(
