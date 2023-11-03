@@ -1,6 +1,6 @@
 from fpdf import FPDF
 
-def generate_pdf_from_text(text, output_path):
+def generate_pdf_from_text(gui, text, output_path):
     """
     Convert given structured text into a PDF document.
     """
@@ -23,6 +23,9 @@ def generate_pdf_from_text(text, output_path):
             # Page number
             self.cell(0, 10, 'Page ' + str(self.page_no()), 0, 0, 'C')
 
+    gui.progress['value'] = 90
+    gui.root.after(0, gui.update_status, 'Creating PDF... Complete', 'black')
+
     # Create instance of PDF class
     pdf = PDF()
     pdf.add_page()
@@ -31,6 +34,9 @@ def generate_pdf_from_text(text, output_path):
 
     # Save the pdf with name .pdf
     pdf.output(output_path)
+
+    gui.progress['value'] = 100
+    gui.root.after(0, gui.update_status, 'Creating PDF... Complete', 'black')
 
 # # Example usage:
 # text_content = """
