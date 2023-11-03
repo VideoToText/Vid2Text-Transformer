@@ -9,6 +9,7 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 from threading import Thread
 
+from src.file_refactoring import delete_legacy_files
 from src.script_to_text import vtt_to_string
 from src.vid_downloader import vid_download, thumbnail_download, get_video_title, is_valid_video, script_download
 from src.text_extractor import extract_text_from_video
@@ -132,14 +133,15 @@ class VidToPdf:
 
             # Script download
             script_download(self, url, resource_dir)
-            script_path = os.path.join(resource_dir, "script.vtt")
-            script_text = vtt_to_string(script_path)
+            script_path = os.path.join(resource_dir, "script.ko.vtt")
+            script_text = vtt_to_string(self, script_path)
 
             # OCR Script Generate
             video_text = extract_text_from_video(self, video_path)
 
             structured_output = process_video_contents_with_gpt(self, script_text, video_text)
             generate_pdf_from_text(self, structured_output, "output.pdf")
+            delete_legacy_files()
 
     def set(self, *args):
         url = self.urlentry.get()
@@ -148,7 +150,7 @@ class VidToPdf:
             self.root.after(0, self.update_status, 'Enter Youtube URL for converting Video', 'red')
             return
 
-        elif not is_valid_video(url):
+        if not is_valid_video(url):
             self.video_title = "vid2pdf"
             self.vtitlemsg.set(self.video_title)
             self.root.after(0, self.update_status, 'Video Not Found', 'red')
@@ -159,7 +161,6 @@ class VidToPdf:
             logo_label.grid(row=0, column=1, pady=10)
             return
 
-        # self.root.after(0, self.update_status, 'Processing', 'blue')
         self.video_title = get_video_title(url)
         self.vtitlemsg.set(self.video_title)
 
