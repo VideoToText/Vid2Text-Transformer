@@ -1,8 +1,10 @@
 import io
 import logging
+import time
+
 from google.cloud import videointelligence
 
-def extract_text_from_video(video_path):
+def extract_text_from_video(gui, video_path):
     """
     Using Google Vision API or other OCR tools, extract text from video.
     """
@@ -19,6 +21,8 @@ def extract_text_from_video(video_path):
     logging.basicConfig(level=logging.INFO)
 
     try:
+        gui.progress['value'] = 50
+        gui.root.after(0, gui.update_status, 'Extracting OCR Data...', 'black')
         logging.info("API call started")
         operation = video_client.annotate_video(
             request={
@@ -27,6 +31,9 @@ def extract_text_from_video(video_path):
                 "video_context": video_context,
             }
         )
+        gui.progress['value'] = 60
+        gui.root.after(0, gui.update_status, 'Extracting OCR Data...', 'black')
+        time.sleep(1)
         logging.info("API call finished")
     except Exception as e:
         logging.error(f"API call failed: {str(e)}")
