@@ -1,5 +1,7 @@
 import os
 import tkinter as tk
+import tkinter.messagebox
+
 from PIL import ImageTk, Image
 from tkinter import filedialog as fd
 from tkinter import ttk
@@ -30,7 +32,7 @@ class VidToPdf:
         self.root.resizable(width=False, height=False)
 
         self.statusmsg = tk.StringVar()
-        self.statusmsg.set('Waiting')
+        self.root.after(0, self.update_status, 'Waiting', 'black')
         self.vtitlemsg = tk.StringVar()
         self.vtitlemsg.set(self.video_title)
 
@@ -142,11 +144,13 @@ class VidToPdf:
 
             self.video_title = "vid2pdf"
             self.vtitlemsg.set(self.video_title)
-            self.root.after(0, self.update_status, 'Youtube URL is not valid', 'red')
+            self.root.after(0, self.update_status, 'Waiting', 'black')
             logo_label = self.logo_panel.winfo_children()[0]
             logo_label.configure(image=self.vid_to_pdf_logo)
             logo_label.image = self.vid_to_pdf_logo
             logo_label.grid(row=0, column=1, pady=10)
+
+            tkinter.messagebox.showinfo("Download Complete", "PDF Download Complete Successfully")
 
 
     def set(self, *args):
