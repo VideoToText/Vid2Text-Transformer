@@ -1,9 +1,5 @@
 import os
-import re
-import requests
 import tkinter as tk
-from io import BytesIO
-from bs4 import BeautifulSoup
 from PIL import ImageTk, Image
 from tkinter import filedialog as fd
 from tkinter import ttk
@@ -133,7 +129,7 @@ class VidToPdf:
 
             # Script download
             script_download(self, url, resource_dir)
-            script_path = os.path.join(resource_dir, "script.ko.vtt")
+            script_path = os.path.join(resource_dir, "script.en.vtt")
             script_text = vtt_to_string(self, script_path)
 
             # OCR Script Generate
