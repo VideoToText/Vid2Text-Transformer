@@ -26,9 +26,9 @@ Ensure you have the following libraries and tools installed:
 
 ## Setup & Installation
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/VideoToText/Vid2Text-Transformer.git
-   ```
+  ```bash
+  git clone https://github.com/VideoToText/Vid2Text-Transformer.git
+  ```
 
 2. Navigate to the cloned directory:
 
@@ -62,4 +62,4 @@ Ensure you have the following libraries and tools installed:
 - 김병주 (201804223)
 - 함윤식 (201902769)
 - 손제휘 (202102653)
-- 하현준 (202102727)
+- 한현준 (202102727)
