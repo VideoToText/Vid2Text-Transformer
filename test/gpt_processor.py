@@ -7,7 +7,7 @@ def setup_gpt():
     """
     Initialize the OpenAI GPT API with the key.
     """
-    api_key = "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"
+    api_key = ""
     print(f"Loaded API Key: {api_key}")
     openai.api_key = api_key
 
