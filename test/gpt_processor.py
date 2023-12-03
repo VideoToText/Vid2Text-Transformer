@@ -37,7 +37,7 @@ def process_video_contents_with_gpt(script_data, ocr_data):
     use the GPT API to structure and refine it.
     """
 
-    prompt_content = f"Voice Data: {script_data}\nOCR Data: {ocr_data}\n The above is a transcript of a video. Please structure it into a well-formatted document starting with indexes like a textbook."
+    prompt_content = f"Voice Data: {script_data}\nOCR Data: {ocr_data}\n The above is a transcript and ocr of a video. Please structure it into a well-formatted document starting with indexes like a textbook."
 
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
